@@ -1,0 +1,39 @@
+<?php
+
+return [
+    'default' => 'mysql57-rw',
+
+    'pool' => [
+        'mysql57-rw' => [
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'user' => 'USER',
+            'pswd' => 'PASSWORD',
+        ],
+    ],
+
+    'master' => [
+        //'master-1',
+        //'master-2',
+    ],
+
+    'slave' => [
+        //'slave-1',
+        //'slave-2',
+    ],
+
+    'rw' => [
+        //'rw-1',
+        //'rw-2',
+    ],
+
+    'ro' => [
+        //'ro-1',
+        //'ro-2',
+    ],
+
+    'wo' => [
+        //'wo-1',
+        //'wo-2',
+    ],
+];
