@@ -638,7 +638,7 @@ class MySQLBuilder
         return $unique ? \array_unique($res) : $res;
     }
 
-    public function count() : int
+    public function count()
     {
         $this->alias = [];
         $this->aliasRaw = ['total' => 'count(*)'];
@@ -648,7 +648,7 @@ class MySQLBuilder
 
         $res = $this->get();
 
-        return \intval($res[0]['total'] ?? 0);
+        return $this->sql ? $res : \intval($res[0]['total'] ?? 0);
     }
 
     public function limit(int $limit, int $offset = null)
