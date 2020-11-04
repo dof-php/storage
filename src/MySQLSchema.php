@@ -143,7 +143,7 @@ class MySQLSchema
                         throw new MySQLSchemaExceptor('COLUMN_WITHOUT_LENGTH', \compact('column', 'type'));
                     }
 
-                    $_type .= "({$length})";
+                    $_type .= ($decimal = ($property['DECIMAL'] ?? null)) ? "({$length}, {$decimal})" : "({$length})";
                 }
 
                 $notnull = 'NOT NULL';
@@ -201,6 +201,7 @@ class MySQLSchema
                     throw new MySQLSchemaExceptor('COLUMN_WITHOUT_LENGTH', \compact('table', 'column', 'type'));
                 }
 
+                $lengthInCode = ($decimal = ($attrs['DECIMAL'] ?? null)) ? "{$lengthInCode}, {$decimal}" : "{$lengthInCode}";
                 $typeInCode = \trim("{$typeInCode}({$lengthInCode}) {$unsignedInCode}");
             }
 
@@ -544,7 +545,7 @@ class MySQLSchema
                     throw new MySQLSchemaExceptor('COLUMN_WITHOUT_LENGTH', \compact('column', 'type'));
                 }
 
-                $_type .= "({$len})";
+                $_type .= ($decimal = ($attr['DECIMAL'] ?? null)) ? "({$len}, {$decimal})" : "({$len})";
             }
 
             if ($column === $pkName) {
