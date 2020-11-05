@@ -97,38 +97,85 @@ class MySQLBuilder
         return $this;
     }
 
-    public function zero(string $column)
+    public function zeros(...$columns)
     {
-        $this->where[] = [$column, '!=', ''];
-        $this->where[] = [$column, '=', 0];
+        foreach ($columns as $column) {
+            $this->where[] = [$column, '=', 0];
+        }
 
         return $this;
     }
 
-    public function empty(string $column)
+    public function zero(...$columns)
     {
-        $this->where[] = [$column, '=', ''];
+        foreach ($columns as $column) {
+            $this->or[] = [$column, '=', 0];
+        }
 
         return $this;
     }
 
-    public function notnull(string $column)
+    public function emptys(...$columns)
     {
-        $this->where[] = [$column, 'IS NOT NULL', null];
+        foreach ($columns as $column) {
+            $this->where[] = [$column, '=', ''];
+        }
 
         return $this;
     }
 
-    public function null(string $column)
+    public function empty(...$columns)
     {
-        $this->where[] = [$column, 'IS NULL', null];
+        foreach ($columns as $column) {
+            $this->or[] = [$column, '=', ''];
+        }
+
+        return $this;
+    }
+
+    public function notnulls(...$columns)
+    {
+        foreach ($columns as $column) {
+            $this->where[] = [$column, 'IS NOT NULL', null];
+        }
+
+        return $this;
+    }
+
+    public function notnull(...$columns)
+    {
+        foreach ($columns as $column) {
+            $this->or[] = [$column, 'IS NOT NULL', null];
+        }
+
+        return $this;
+    }
+
+    public function nulls(...$columns)
+    {
+        foreach ($columns as $column) {
+            $this->where[] = [$column, 'IS NULL', null];
+        }
+
+        return $this;
+    }
+
+    public function null(...$columns)
+    {
+        foreach ($columns as $column) {
+            $this->or[] = [$column, 'IS NULL', null];
+        }
 
         return $this;
     }
 
     public function not(string $column, $value)
     {
-        $this->where[] = [$column, '!=', $value];
+        if (\is_null($value)) {
+            $this->where[] = [$column, 'IS NOT NULL', null];
+        } else {
+            $this->where[] = [$column, '!=', $value];
+        }
 
         return $this;
     }
@@ -785,7 +832,7 @@ class MySQLBuilder
             $selects = '';
             $columns = $this->origin ? $this->origin->getSelectColumns(false) : ['*'];
             foreach ($columns as $column) {
-                $selects .= "`{$column}`";
+                $selects .=  ('*' === $column) ? '*' : "`{$column}`";
                 if (\next($columns) !== false) {
                     $selects .= ',';
                 }
