@@ -712,6 +712,10 @@ class MySQLBuilder
 
     public function chunk(int $chunk, Closure $task)
     {
+        if ($chunk <= 0) {
+            throw new MySQLBuilderExceptor('INVALID_CHUNK_NUMBER', \compact('chunk'));
+        }
+
         $paginator = $this->paginate(1, $chunk);
         if ($list = $paginator->getList()) {
             foreach ($list as $item) {
@@ -719,7 +723,7 @@ class MySQLBuilder
             }
 
             $total = $paginator->getTotal();
-            $pages = \ceil($total % $chunk);
+            $pages = \ceil($total / $chunk);
             for ($i=2; $i <= $pages; $i++) {
                 $paginator = $this->paginate($i, $chunk);
                 if ($list = $paginator->getList()) {
