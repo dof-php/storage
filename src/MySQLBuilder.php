@@ -710,6 +710,27 @@ class MySQLBuilder
         return $this;
     }
 
+    public function chunk(int $chunk, Closure $task)
+    {
+        $paginator = $this->paginate(1, $chunk);
+        if ($list = $paginator->getList()) {
+            foreach ($list as $item) {
+                $task($item, 1);
+            }
+
+            $total = $paginator->getTotal();
+            $pages = \ceil($total % $chunk);
+            for ($i=2; $i <= $pages; $i++) {
+                $paginator = $this->paginate($i, $chunk);
+                if ($list = $paginator->getList()) {
+                    foreach ($list as $item) {
+                        $task($item, $i);
+                    }
+                }
+            }
+        }
+    }
+
     public function paginate(int $page, int $size)
     {
         $alias = $this->alias;
