@@ -716,7 +716,8 @@ class MySQLBuilder
             throw new MySQLBuilderExceptor('INVALID_CHUNK_NUMBER', \compact('chunk'));
         }
 
-        $paginator = $this->paginate(1, $chunk);
+        $builder = clone $this;
+        $paginator = $builder->paginate(1, $chunk);
         if ($list = $paginator->getList()) {
             foreach ($list as $item) {
                 $task($item, 1);
@@ -725,7 +726,7 @@ class MySQLBuilder
             $total = $paginator->getTotal();
             $pages = \ceil($total / $chunk);
             for ($i=2; $i <= $pages; $i++) {
-                $paginator = $this->paginate($i, $chunk);
+                $paginator = (clone $builder)->paginate($i, $chunk);
                 if ($list = $paginator->getList()) {
                     foreach ($list as $item) {
                         $task($item, $i);
