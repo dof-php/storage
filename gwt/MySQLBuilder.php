@@ -15,3 +15,10 @@ $gwt->true('Test SQL for MySQLBuilder::notnulls()', Str::eq((new MySQLBuilder)->
 $gwt->true('Test SQL for MySQLBuilder::not()', Str::eq((new MySQLBuilder)->not('name', 'dof')->sql(true)->get(), "SELECT * FROM #{TABLE}  WHERE `name` != 'dof'", false, true));
 $gwt->true('Test SQL for MySQLBuilder::not() - numbers without single quotation marks', Str::eq((new MySQLBuilder)->not('name', 1)->sql(true)->get(), "SELECT * FROM #{TABLE}  WHERE `name` != 1", false, true));
 $gwt->true('Test SQL for MySQLBuilder::not() - not null', Str::eq((new MySQLBuilder)->not('name', null)->sql(true)->get(), "SELECT * FROM #{TABLE}  WHERE `name` IS NOT NULL", false, true));
+
+$gwt->true('Test SQL for MySQLBuilder::partition() - #1', Str::eq((new MySQLBuilder)->partition(5)->sql(true)->get(), "SELECT * FROM #{TABLE}  WHERE (`id` % 5 = 5)", false, true));
+$gwt->true('Test SQL for MySQLBuilder::partition() - #2', Str::eq((new MySQLBuilder)->partition(5, 'status')->sql(true)->get(), "SELECT * FROM #{TABLE}  WHERE (`status` % 5 = 5)", false, true));
+$gwt->true('Test SQL for MySQLBuilder::partition() - #3', Str::eq((new MySQLBuilder)->notnulls('name')->partition(5)->sql(true)->get(), "SELECT * FROM #{TABLE}  WHERE `name` IS NOT NULL  AND (`id` % 5 = 5)", false, true));
+$gwt->true('Test SQL for MySQLBuilder::partition() - #4', Str::eq((new MySQLBuilder)->notnulls('name')->partition(5, 'status')->sql(true)->get(), "SELECT * FROM #{TABLE}  WHERE `name` IS NOT NULL  AND (`status` % 5 = 5)", false, true));
+
+$gwt->true('Test SQL for MySQLBuilder::sum() - #1', Str::eq((new MySQLBuilder)->sql(true)->sum('money'), "SELECT SUM(`money`) AS `total` FROM #{TABLE}", false, true));

@@ -9,6 +9,8 @@ use DOF\Util\IS;
 use DOF\Util\Str;
 use DOF\Util\Arr;
 use DOF\Util\Paginator;
+use DOF\Util\TypeHint;
+use DOF\Util\TypeCast;
 use DOF\Storage\Exceptor\MySQLBuilderExceptor;
 
 class MySQLBuilder
@@ -685,6 +687,29 @@ class MySQLBuilder
         return $unique ? \array_unique($res) : $res;
     }
 
+    public function sum(string $column)
+    {
+        $this->alias = [];
+        $this->aliasRaw = ['total' => "SUM(`{$column}`)"];
+        $this->select = ['total'];
+
+        $this->limit = $this->offset = null;
+
+        $res = $this->get();
+        if ($this->sql) {
+            return $res;
+        }
+        $res = $res[0]['total'] ?? null;
+        if (TypeHint::int($res)) {
+            return TypeCast::int($res);
+        }
+        if (TypeHint::float($res)) {
+            return TypeCast::float($res);
+        }
+
+        return 0;
+    }
+
     public function count()
     {
         $this->alias = [];
@@ -777,6 +802,17 @@ class MySQLBuilder
         $result = $this->get();
 
         return $this->sql ? $result : (($result[0]['cnt'] ?? 0) > 0);
+    }
+
+    public function partition(int $queue, string $column = 'id')
+    {
+        if ($queue < 1) {
+            throw new MySQLBuilderExceptor('INVALID_PARTITION_QUEUE_NUMBER', \compact('queue'));
+        }
+
+        $this->rawWhere("`{$column}` % {$queue} = {$queue}");
+
+        return $this;
     }
 
     public function pk(string $pk = 'id')
