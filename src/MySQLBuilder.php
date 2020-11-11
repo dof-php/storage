@@ -710,7 +710,7 @@ class MySQLBuilder
         return $this;
     }
 
-    public function chunk(int $chunk, Closure $task)
+    public function chunk(int $chunk, Closure $task, bool $loop = true)
     {
         if ($chunk <= 0) {
             throw new MySQLBuilderExceptor('INVALID_CHUNK_NUMBER', \compact('chunk'));
@@ -719,8 +719,12 @@ class MySQLBuilder
         $builder = clone $this;
         $paginator = $builder->paginate(1, $chunk);
         if ($list = $paginator->getList()) {
-            foreach ($list as $item) {
-                $task($item, 1);
+            if ($loop) {
+                foreach ($list as $item) {
+                    $task($item, 1);
+                }
+            } else {
+                $task($list, 1);
             }
 
             $total = $paginator->getTotal();
@@ -728,8 +732,12 @@ class MySQLBuilder
             for ($i=2; $i <= $pages; $i++) {
                 $paginator = (clone $builder)->paginate($i, $chunk);
                 if ($list = $paginator->getList()) {
-                    foreach ($list as $item) {
-                        $task($item, $i);
+                    if ($list) {
+                        foreach ($list as $item) {
+                            $task($item, $i);
+                        }
+                    } else {
+                        $task($list, $i);
                     }
                 }
             }
